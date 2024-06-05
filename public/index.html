@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Trends</title>
+    <script>
+        async function runScript() {
+            document.getElementById('result').innerText = 'Running script, please wait...';
+            try {
+                let response = await fetch('/run-script');
+
+                if (response.ok) {
+                    let data = await response.json();
+
+                    const {trendingTopicsDocument, records} = data
+                    console.log("This is trend 1 : ", trendingTopicsDocument.trend1)
+                    console.log("This is trend 2 : ", trendingTopicsDocument.trend2)
+                    let resultDiv = document.getElementById('result');
+                    resultDiv.innerHTML = `
+                        <p>These are the most happening topics as on ${data.formattedDate}:</p>
+                        <ul>
+                            <li>${trendingTopicsDocument.trend1 || 'No data'}</li>
+                            <li>${trendingTopicsDocument.trend2 || 'No data'}</li>
+                            <li>${trendingTopicsDocument.trend3 || 'No data'}</li>
+                            <li>${trendingTopicsDocument.trend4 || 'No data'}</li>
+                            <li>${trendingTopicsDocument.trend5 || 'No data'}</li>
+                        </ul>
+                        <p>The IP address used for this query was ${trendingTopicsDocument.ipAddress}.</p>
+                        <p>Here’s a JSON extract of this record from the MongoDB:</p>
+                        <pre>${JSON.stringify(records, null, 2)}</pre>
+                        <button onclick="runScript()">Click here to run the query again.</button>
+                    `;
+                } else {
+                    document.getElementById('result').innerText = 'Error running script: ' + response.statusText;
+                }
+            } catch (error) {
+                document.getElementById('result').innerText = 'Error running script: ' + error;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Twitter Trends</h1>
+    <button onclick="runScript()">Click here to run the script</button>
+    <div id="result"></div>
+</body>
+</html>
